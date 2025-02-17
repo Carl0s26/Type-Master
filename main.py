@@ -38,6 +38,7 @@ def main(page: ft.Page):
             userInput.value = ""
             nextWord()
         page.update()
+        userInput.focus()
 
     page.on_keyboard_event = on_keyboard
 
@@ -54,33 +55,46 @@ def main(page: ft.Page):
         global currentWords
         wordstracked.value = f'{(len(words)) - len(currentWords)}/{len(words)-1}'
         if (len(words)) - len(currentWords) != 0:
-            acurracyLabel.value = f"Accuracy: {abs((correctWords / ((len(words)) - len(currentWords))) * 100)}%"
+            print(f"{correctWords},{len(words)} - {len(currentWords)}")
+            acurracyLabel.value = f"Accuracy: {int(abs((correctWords / ((len(words)) - len(currentWords))) * 100))}%"
 
     def retryTest():
         global currentWords
+        global correctWords
         currentWords = words.copy()
         status.color = ft.Colors.PINK
+        correctWords = 0
+        score.value = f"Points: 0"
         nextWord()
+        acurracyCalculator()
+        userInput.disabled = False
+        userInput.value = ""
+        acurracyLabel.value = "Start the test to see your acurracy!"
+        wordstracked.value= f"0/{len(words)}"
         page.update()
 
     def nextWord():
         global currentWords
         global currentWord
-        acurracyCalculator()
-        print(currentWord)
-        randomNum = rand.randint(0,len(currentWords)-1)
-        currentWord = currentWords[randomNum]
-        wordLabel.value = currentWord
-        currentWords.pop(randomNum)
-        print(currentWord)
-        page.update()
-        
+        global words
+        if (len(words)) - len(currentWords) != (len(words)-1):
+            print(currentWord)
+            randomNum = rand.randint(0,len(currentWords)-1)
+            currentWord = currentWords[randomNum]
+            wordLabel.value = currentWord
+            currentWords.pop(randomNum)
+            print(currentWord)
+            page.update()
+        else:
+            userInput.disabled = True
+            userInput.value = "You Finished The Test :)"
 
 
-    title = ft.Text(value="Hello Word")
+
+    title = ft.Text(value="The Typing Test!")
     userInput = ft.TextField()
     score = ft.Text(value="0 Points")
-    wordstracked = ft.Text(value="0/15")
+    wordstracked = ft.Text(value=f"0/{len(words)}")
     acurracyLabel = ft.Text("Start the test to see your acurracy!")
     status = ft.Text(value="STATUS")
     wordLabel = ft.Text(value="Current Word")
@@ -88,7 +102,7 @@ def main(page: ft.Page):
 
 
     page.bgcolor = '#c8eed8'
-    page.add(title,userInput,status,acurracyLabel,wordstracked,score,wordLabel,retryButton)
+    page.add(title,status,wordstracked,wordLabel,userInput,acurracyLabel,score,retryButton)
     page.update()
 
     retryTest()
